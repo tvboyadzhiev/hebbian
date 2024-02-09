@@ -1,0 +1,1 @@
+from models.image_classifier import ImageClassifier
