@@ -28,7 +28,7 @@ def stride(level):
 
 train = DataLoader(
     ImageFolder(
-        config.data_root / 'pisa-monuments'/'train_test',
+        config.data_root / 'imagenet'/ 'train',
         transform=v2.Compose([
             v2.RandomResize(320, 600),
             v2.RandomCrop(320),
@@ -53,7 +53,7 @@ model = nn.Sequential(
             hebb.HebbianConv2d(filters(level), filters(level), 3, alpha=1, padding=1)
         )
         for level in range(levels)
-    ]
+    ] # kernel_size - 7 3 3 3; stride - 4 2 2 2; filters - 32 64 128 256
 ) # output is 1/32 of original resolution
 
 
@@ -67,5 +67,6 @@ if __name__ == '__main__':
         epoch_callbacks=[
             callbacks.Last(exp_root),  # Saves last state. Can be used to restart traning in case of crash
             callbacks.Logger(exp_root),  # Simple log file which can be seen with tail -f log.csv
-        ]
+        ],
+        recover_checkpoint= exp_root / 'last.pth'
     )

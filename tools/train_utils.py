@@ -83,13 +83,14 @@ def train(model, data, opt, calc_loss=None, val_data=None, epochs=1,
 
     if recover_checkpoint is not None and recover_checkpoint.exists():
         print(f'initialising from checkpoint {recover_checkpoint}')
-        checkpoint = torch.load(recover_checkpoint)
+        checkpoint = torch.load(recover_checkpoint, map_location='cpu')
 
         model.load_state_dict(checkpoint['model_state_dict'])
+        model = model.to(config.device)
         
         if checkpoint['opt_state_dict'] is not None:
            opt.load_state_dict(checkpoint['opt_state_dict'])
-        if checkpoint['lr_scheduler'] is not None:
+        if 'lr_scheduler' in checkpoint and checkpoint['lr_scheduler'] is not None:
             learning_rate_schedule.load_state_dict(checkpoint['lr_scheduler'])
 
         train_meas = checkpoint['train_meas']
