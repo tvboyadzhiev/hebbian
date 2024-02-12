@@ -1,4 +1,4 @@
-from pathlib import Path
+import os
 
 import torch
 from torchvision.datasets import ImageFolder
@@ -26,8 +26,8 @@ def trail(exp_root):
         ImageFolder(
             train_data_root,
             transform=v2.Compose([
-                v2.RandomResize(256, 480),
-                v2.RandomCrop(224),
+                v2.RandomResize(300, 450),
+                v2.RandomCrop(300),
                 v2.AutoAugment(policy=v2.AutoAugmentPolicy.IMAGENET),
                 v2.ToImage(),
                 v2.ToDtype(torch.float32, scale=True),
@@ -39,15 +39,15 @@ def trail(exp_root):
         ),
         batch_size=batch_size,
         shuffle=True,
-        num_workers=20
+        num_workers=os.cpu_count()
     )
 
     val = DataLoader(
         ImageFolder(
             test_data_root,
             transform=v2.Compose([
-                v2.Resize(256),
-                v2.CenterCrop(224),
+                v2.Resize(300),
+                v2.CenterCrop(300),
                 v2.ToImage(),
                 v2.ToDtype(torch.float32, scale=True),
                 v2.Normalize(
@@ -58,7 +58,7 @@ def trail(exp_root):
         ),
         batch_size=batch_size,
         shuffle=False,
-        num_workers=20
+        num_workers=os.cpu_count()
     )
 
 
