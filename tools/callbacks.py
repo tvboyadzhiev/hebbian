@@ -12,7 +12,7 @@ class Checkpoint:
     def save(self, model, opt, e, train_meas, val_meas, lr_scheduler, checkpoint_name):
         torch.save({
             'model_state_dict': model.state_dict(),
-            'opt_state_dict': opt.state_dict(),
+            'opt_state_dict': opt.state_dict() if opt is not None else None,
             'lr_scheduler_state_dict': lr_scheduler.state_dict() if lr_scheduler is not None else None,
 
             'epoch': e,

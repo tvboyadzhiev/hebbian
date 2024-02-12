@@ -26,9 +26,10 @@ def train_epoch(model, calc_loss, data, opt, measurements=None, callbacks=None, 
         targets = data_to_device(targets)
 
         predicted = model(inputs)  # Get prediction from the model
-        loss = calc_loss(predicted, targets) / batch_acc # Calculate the loss
 
-        loss.backward()
+        if calc_loss is not None: # Hebbian pre-training does not require loss
+            loss = calc_loss(predicted, targets) / batch_acc # Calculate the loss
+            loss.backward()
 
         if (i+1) % batch_acc == 0 or i+1 == len(data):
             opt.step()
@@ -53,7 +54,7 @@ def validate_epoch(model, data, measurements):
             [m(predicted, targets) for m in measurements]
 
 
-def train(model, calc_loss, data, val_data, opt, epochs,
+def train(model, data, opt, calc_loss=None, val_data=None, epochs=1,
           train_measurements=None,
           val_measurements=None,
           epoch_callbacks=None,
@@ -69,12 +70,14 @@ def train(model, calc_loss, data, val_data, opt, epochs,
         val_measurements = []
 
     train_meas = [Accumulator(f'train_{m}', m) for m in train_measurements]
-    train_meas.insert(0, Accumulator('train_loss', calc_loss))
+    if calc_loss is not None:
+        train_meas.insert(0, Accumulator('train_loss', calc_loss))
 
     val_meas = []
     if val_data is not None:
         val_meas = [Accumulator(f'val_{m}', m) for m in val_measurements]
-        val_meas.insert(0, Accumulator('val_loss', calc_loss))
+        if calc_loss is not None:
+            val_meas.insert(0, Accumulator('val_loss', calc_loss))
 
     start_epoch = 0
 
@@ -83,8 +86,10 @@ def train(model, calc_loss, data, val_data, opt, epochs,
         checkpoint = torch.load(recover_checkpoint)
 
         model.load_state_dict(checkpoint['model_state_dict'])
-        opt.load_state_dict(checkpoint['opt_state_dict'])
-        if learning_rate_schedule is not None:
+        
+        if checkpoint['opt_state_dict'] is not None:
+           opt.load_state_dict(checkpoint['opt_state_dict'])
+        if checkpoint['lr_scheduler'] is not None:
             learning_rate_schedule.load_state_dict(checkpoint['lr_scheduler'])
 
         train_meas = checkpoint['train_meas']
