@@ -88,14 +88,14 @@ def train(model, data, opt, calc_loss=None, val_data=None, epochs=1,
         model.load_state_dict(checkpoint['model_state_dict'])
         model = model.to(config.device)
         
-        if checkpoint['opt_state_dict'] is not None:
+        if 'opt_state_dict' in checkpoint and checkpoint['opt_state_dict'] is not None:
            opt.load_state_dict(checkpoint['opt_state_dict'])
         if 'lr_scheduler' in checkpoint and checkpoint['lr_scheduler'] is not None:
             learning_rate_schedule.load_state_dict(checkpoint['lr_scheduler'])
 
         train_meas = checkpoint['train_meas']
         val_meas = checkpoint['val_meas']
-        start_epoch = checkpoint['epoch']
+        start_epoch = checkpoint['epoch'] + 1
 
         checkpoint = None # dereference
         
