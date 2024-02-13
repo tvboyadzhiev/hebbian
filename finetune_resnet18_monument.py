@@ -71,9 +71,9 @@ def trail(exp_root):
 
     tools.train(
         model,
-        torch.nn.CrossEntropyLoss(label_smoothing=0.1),
-        train,
-        val,
+        calc_loss=torch.nn.CrossEntropyLoss(label_smoothing=0.1),
+        data=train,
+        val_data=val,
         opt=opt,
         epochs=epochs,
         train_measurements=m,

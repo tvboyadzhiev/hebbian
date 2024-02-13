@@ -30,7 +30,11 @@ def train_epoch(model, calc_loss, data, opt, measurements=None, callbacks=None, 
         if calc_loss is not None: # Hebbian pre-training does not require loss
             loss = calc_loss(predicted, targets) / batch_acc # Calculate the loss
             loss.backward()
-
+        
+        for m in model.modules():
+            if hasattr(m, 'local_update'):
+                m.local_update()
+        
         if (i+1) % batch_acc == 0 or i+1 == len(data):
             opt.step()
             opt.zero_grad()
