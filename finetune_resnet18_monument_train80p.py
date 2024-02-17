@@ -1,4 +1,5 @@
 import os
+import random
 
 import torch
 from torchvision.datasets import ImageFolder
@@ -18,7 +19,8 @@ def trail(exp_root):
 
     train_data_root, test_data_root = H.random_split(
         config.data_root / 'pisa-monuments' / 'train_test',
-        exp_root
+        exp_root,
+        0.8
     )
     print(train_data_root, ' ', test_data_root)
     
@@ -89,6 +91,8 @@ def trail(exp_root):
     )
 
 if __name__ == '__main__':
+    torch.manual_seed(3669583266)
+    random.seed(4135956816)
     exp_root = H.build_exp_path(__file__)
 
     # repeat an experiment 
